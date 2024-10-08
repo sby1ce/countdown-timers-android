@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.countdowntimers.comp.TimerBlock
@@ -38,7 +39,8 @@ fun Page(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
             text = "Watch countdowns",
-            modifier = Modifier.padding(8.dp)
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp),
         )
 
         TimerBlock(TimerViewModel())
