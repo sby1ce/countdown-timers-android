@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.countdowntimers.lib.TimerViewModel
@@ -64,9 +63,11 @@ fun AddTimer(viewModel: TimerViewModel) {
     }
 
     val dateModal = @Composable {
-        DatePickerDialog(onDismissRequest = { showDateModal = false },
+        DatePickerDialog(
+            onDismissRequest = { showDateModal = false },
             confirmButton = {
-                Button(onClick = { showDateModal = false }) {
+                Button(
+                    onClick = { showDateModal = false }) {
                     Text(text = "Confirm")
                 }
             }) {
@@ -76,9 +77,11 @@ fun AddTimer(viewModel: TimerViewModel) {
         }
     }
     val timeModal = @Composable {
-        DatePickerDialog(onDismissRequest = { showTimeModal = false },
+        DatePickerDialog(
+            onDismissRequest = { showTimeModal = false },
             confirmButton = {
-                Button(onClick = { showTimeModal = false }) {
+                Button(
+                    onClick = { showTimeModal = false }) {
                     Text(text = "Confirm")
                 }
             }) {
@@ -89,9 +92,11 @@ fun AddTimer(viewModel: TimerViewModel) {
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(value = TextFieldValue(text = name),
-            onValueChange = { text: TextFieldValue -> name = text.text },
-            label = { Text(text = "Timer name here") })
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text(text = "Timer name here") }
+        )
         OutlinedTextField(
             value = showDateTime(date, time),
             onValueChange = {},
@@ -104,16 +109,21 @@ fun AddTimer(viewModel: TimerViewModel) {
             Text(text = errorText)
         }
         Row {
-            FilledTonalButton(modifier = Modifier.padding(4.dp),
-                onClick = { showDateModal = true }) {
+            FilledTonalButton(
+                modifier = Modifier.padding(4.dp),
+                onClick = { showDateModal = true }
+            ) {
                 Text(text = "Pick date")
             }
-            FilledTonalButton(modifier = Modifier.padding(4.dp),
-                onClick = { showTimeModal = true }) {
+            FilledTonalButton(
+                modifier = Modifier.padding(4.dp),
+                onClick = { showTimeModal = true },
+            ) {
                 Text(text = "Pick time")
             }
-            Button(modifier = Modifier.padding(4.dp),
-                onClick = addTimer) {
+            Button(
+                modifier = Modifier.padding(4.dp), onClick = addTimer
+            ) {
                 Text(text = "Add timer")
             }
         }
