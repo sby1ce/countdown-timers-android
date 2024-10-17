@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.countdowntimers.comp.TimerProps
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -117,15 +118,13 @@ fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
 }
 
 class TimerViewModel : ViewModel() {
-    var timers = mutableStateListOf(
+    private var timers = mutableStateListOf(
         ITimer(key = "timer1", name = "Timer 1", origin = 0),
         ITimer(key = "timer2", name = "Timer 2", origin = 10000),
     )
-        private set
 
     private fun origins(): List<Long> = timers.map { timer -> timer.origin }
-    var renders by mutableStateOf<List<List<String>>>(emptyList())
-        private set
+    private var renders by mutableStateOf<List<List<String>>>(emptyList())
 
     init {
         viewModelScope.launch(context = Dispatchers.Main) {
@@ -133,6 +132,12 @@ class TimerViewModel : ViewModel() {
                 renders = ktTimers(origins())
                 delay(timeMillis = 1000)
             }
+        }
+    }
+
+    fun timerProps(): List<TimerProps> {
+        return (timers.toList() zip renders).mapIndexed { id, (timer, origin) ->
+            TimerProps(id, timer.name, origin)
         }
     }
 

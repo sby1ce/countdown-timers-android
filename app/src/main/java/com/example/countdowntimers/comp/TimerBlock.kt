@@ -11,21 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.countdowntimers.lib.ITimer
 import com.example.countdowntimers.lib.TimerViewModel
-
-private fun timerProps(
-    timers: List<ITimer>,
-    renders: List<List<String>>,
-): List<TimerProps> {
-    return (timers zip renders).mapIndexed { id, (timer, origin) ->
-        TimerProps(id, timer.name, origin)
-    }
-}
 
 @Composable
 fun TimerBlock(viewModel: TimerViewModel) {
-    val state = timerProps(viewModel.timers.toList(), viewModel.renders)
+    val state = viewModel.timerProps()
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
