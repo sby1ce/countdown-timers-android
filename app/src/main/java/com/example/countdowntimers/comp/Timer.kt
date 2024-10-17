@@ -1,6 +1,5 @@
 package com.example.countdowntimers.comp
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -20,13 +19,8 @@ data class TimerProps(
     val id: Int,
     val name: String,
     val countdowns: List<String>,
+    val pop: () -> Unit,
 )
-
-const val TAG = "TODO"
-
-fun removeTimer(id: Int) {
-    Log.d(TAG, "Deleting timer with id $id")
-}
 
 private val articleModifier = Modifier.defaultMinSize(300.dp)
 private val h2Modifier = Modifier.padding(vertical = 16.dp)
@@ -34,7 +28,6 @@ private val pModifier = Modifier.padding(vertical = 16.dp, horizontal = 0.dp)
 
 @Composable
 fun Timer(props: TimerProps) {
-    val onClick = { removeTimer(props.id) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(
@@ -51,7 +44,7 @@ fun Timer(props: TimerProps) {
         }
 
         FloatingActionButton(
-            onClick = onClick,
+            onClick = props.pop,
             modifier = Modifier.padding(horizontal = 8.dp)
         ) {
             Icon(
@@ -65,5 +58,5 @@ fun Timer(props: TimerProps) {
 @Preview
 @Composable
 fun TimerPreview() {
-    Timer(TimerProps(0, "Timer 1", listOf("0s")))
+    Timer(TimerProps(0, "Timer 1", listOf("0s")) {})
 }

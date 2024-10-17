@@ -135,9 +135,13 @@ class TimerViewModel : ViewModel() {
         }
     }
 
+    private fun pop(id: Int): () -> Unit {
+        return { timers.removeAt(id) }
+    }
+
     fun timerProps(): List<TimerProps> {
         return (timers.toList() zip renders).mapIndexed { id, (timer, origin) ->
-            TimerProps(id, timer.name, origin)
+            TimerProps(id, timer.name, origin, pop(id))
         }
     }
 
