@@ -7,15 +7,30 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.countdowntimers.lib.ITimer
 import com.example.countdowntimers.lib.TimerViewModel
+
+private fun timerProps(
+    viewModel: TimerViewModel,
+    timers: List<ITimer>,
+    renders: List<List<String>>,
+): List<TimerProps> {
+    return (timers zip renders).mapIndexed { id, (timer, origin) ->
+        TimerProps(id, timer.name, origin) { viewModel.popTimer(id) }
+    }
+}
 
 @Composable
 fun TimerBlock(viewModel: TimerViewModel) {
-    val state = viewModel.timerProps()
+    val timers by viewModel.timersFlow.collectAsState()
+    val renders by viewModel.rendersFlow.collectAsState()
+    val state = timerProps(viewModel, timers, renders)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

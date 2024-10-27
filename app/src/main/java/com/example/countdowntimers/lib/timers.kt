@@ -3,15 +3,12 @@ package com.example.countdowntimers.lib
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.countdowntimers.comp.TimerProps
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -117,31 +114,29 @@ fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
         ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
 }
 
-class TimerViewModel : ViewModel() {
-    private var timers = mutableStateListOf(
-        ITimer(key = "timer1", name = "Timer 1", origin = 0),
-        ITimer(key = "timer2", name = "Timer 2", origin = 10000),
-    )
+private fun origins(timers: List<ITimer>): List<Long> {
+    return timers.map { timer -> timer.origin }
+}
 
-    private fun origins(): List<Long> = timers.map { timer -> timer.origin }
-    private var renders by mutableStateOf<List<List<String>>>(emptyList())
+class TimerViewModel {
+    private val _timersFlow = MutableStateFlow<List<ITimer>>(emptyList())
+    val timersFlow: StateFlow<List<ITimer>> = _timersFlow.asStateFlow()
 
+    private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
+    val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
+
+    // Start a coroutine to update the renders periodically
     init {
-        viewModelScope.launch(context = Dispatchers.Main) {
+        _timersFlow.value = listOf(
+            ITimer(key = "timer1", name = "Timer 1", origin = 0),
+            ITimer(key = "timer2", name = "Timer 2", origin = 10000),
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
             while (true) {
-                renders = ktTimers(origins())
-                delay(timeMillis = 1000)
+                _rendersFlow.value = ktTimers(origins(_timersFlow.value))
+                delay(1000)
             }
-        }
-    }
-
-    private fun pop(id: Int): () -> Unit {
-        return { timers.removeAt(id) }
-    }
-
-    fun timerProps(): List<TimerProps> {
-        return (timers.toList() zip renders).mapIndexed { id, (timer, origin) ->
-            TimerProps(id, timer.name, origin, pop(id))
         }
     }
 
@@ -153,23 +148,21 @@ class TimerViewModel : ViewModel() {
             return "Timer name should have name"
         } else if (date.selectedDateMillis == null) {
             return "Entered date is invalid"
-        } else if (timers.any { timer -> timer.name == name }) {
+        } else if (timersFlow.value.any { timer -> timer.name == name }) {
             return "Timer with the same name already exists"
         }
 
-        viewModelScope.launch(context = Dispatchers.Main) {
-            // Because renders run in the loop,
-            // mutating outside the scope causes threading issues
-            // also the UI mutations should happen on the main thread
-            timers.add(
-                ITimer(
-                    key = hashName(name),
-                    name = name,
-                    origin = getOrigin(date, time)
-                )
-            )
-        }
+        _timersFlow.value = timersFlow.value + ITimer(
+            key = hashName(name),
+            name = name,
+            origin = getOrigin(date, time)
+        )
 
         return null
+    }
+
+    fun popTimer(id: Int) {
+        _timersFlow.value =
+            timersFlow.value.filterIndexed { index, _ -> index != id }
     }
 }
