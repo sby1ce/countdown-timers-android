@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+data class Origins(
+    val kt: List<Long>,
+)
+
 data class ITimer(
     val key: String,
     val name: String,
@@ -91,10 +95,10 @@ private fun updateTimer(origin: Long, now: Long): List<String> {
     return listOf(convert(interval, formatOptions))
 }
 
-fun ktTimers(origins: List<Long>): List<List<String>> {
+fun ktTimers(origins: Origins): List<List<String>> {
     val now: Long = System.currentTimeMillis()
 
-    val result: List<List<String>> = origins.map { origin ->
+    val result: List<List<String>> = origins.kt.map { origin ->
         updateTimer(origin, now)
     }
 
@@ -114,8 +118,8 @@ fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
         ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
 }
 
-private fun origins(timers: List<ITimer>): List<Long> {
-    return timers.map { timer -> timer.origin }
+private fun origins(timers: List<ITimer>): Origins {
+    return Origins(timers.map { timer -> timer.origin })
 }
 
 class TimerViewModel {
