@@ -22,6 +22,27 @@ data class ITimer(
     val origin: Long,
 )
 
+private data class TimeUnit(
+    val suffix: String,
+    val divisor: Long,
+)
+
+const val W_DIVISOR: Long = 1000 * 60 * 60 * 24 * 7
+const val D_DIVISOR: Long = 1000 * 60 * 60 * 24
+const val H_DIVISOR: Long = 1000 * 60 * 60
+const val M_DIVISOR: Long = 1000 * 60
+const val S_DIVISOR: Long = 1000
+const val MS_DIVISOR: Long = 1
+
+private val timeUnits: List<TimeUnit> = listOf(
+    TimeUnit(suffix = "w", divisor = W_DIVISOR),
+    TimeUnit(suffix = "d", divisor = D_DIVISOR),
+    TimeUnit(suffix = "h", divisor = H_DIVISOR),
+    TimeUnit(suffix = "m", divisor = M_DIVISOR),
+    TimeUnit(suffix = "s", divisor = S_DIVISOR),
+    TimeUnit(suffix = "ms", divisor = MS_DIVISOR),
+)
+
 private enum class FormatOption {
     Week,
     Day,
@@ -42,48 +63,85 @@ private enum class FormatOption {
     }
 }
 
-private data class TimeUnit(
-    val suffix: String,
-    val divisor: Long,
-)
+fun calculateInterval(interval: Long, divisor: Long): Pair<Long, String> {
+    val newInterval: Long = interval % divisor
+    val unitCount: Long = interval / divisor
+    return newInterval to unitCount.toString()
+}
 
-private val timeUnits: List<TimeUnit> = listOf(
-    TimeUnit(suffix = "w", divisor = 1000 * 60 * 60 * 24 * 7),
-    TimeUnit(suffix = "d", divisor = 1000 * 60 * 60 * 24),
-    TimeUnit(suffix = "h", divisor = 1000 * 60 * 60),
-    TimeUnit(suffix = "m", divisor = 1000 * 60),
-    TimeUnit(suffix = "s", divisor = 1000),
-    TimeUnit(suffix = "ms", divisor = 1),
-)
+private interface Accumulate<out A : Accumulate<A>> {
+    fun accumulate(
+        interval: Long,
+        formatOption: FormatOption,
+    ): Pair<Long, A>
 
-private fun reduceInterval(
+    fun plus(element: String): A
+}
+
+private class Accumulator(
+    val inner: String,
+) : Accumulate<Accumulator> {
+    override fun accumulate(
+        interval: Long,
+        formatOption: FormatOption,
+    ): Pair<Long, Accumulator> {
+        val timeUnit: TimeUnit = formatOption.toTimeUnit()
+        val (newInterval, unitCount) = calculateInterval(
+            interval,
+            timeUnit.divisor
+        )
+        val newAccumulator = Accumulator(
+            inner = inner + unitCount + timeUnit.suffix + ' ',
+        )
+        return newInterval to newAccumulator
+    }
+
+    override fun plus(element: String): Accumulator {
+        return Accumulator(
+            inner = inner + element,
+        )
+    }
+}
+
+private fun next(formatOptions: List<FormatOption>): List<FormatOption> {
+    return formatOptions.drop(1)
+}
+
+private fun <A : Accumulate<A>> reduceInterval(
     interval: Long,
-    accumulator: String,
+    accumulator: A,
     formatOptions: List<FormatOption>,
-): String {
-    val formatLen = formatOptions.count()
-    if (formatLen == 0) {
+): A {
+    if (formatOptions.isEmpty()) {
         return accumulator
     }
     val formatOption = formatOptions[0]
-    val timeUnit = formatOption.toTimeUnit()
-    val newInterval = interval % timeUnit.divisor
-    val unitCount: Long = interval / timeUnit.divisor
-    val newAccumulator =
-        "$accumulator$unitCount${timeUnit.suffix} "
+    val (newInterval, newAccumulator) = accumulator.accumulate(
+        interval,
+        formatOption
+    )
     return reduceInterval(
-        newInterval, newAccumulator, formatOptions.drop(1)
+        newInterval, newAccumulator, next(formatOptions)
     )
 }
 
-private fun convert(interval: Long, formatOptions: List<FormatOption>): String {
+private fun <A : Accumulate<A>> convert(
+    interval: Long,
+    accumulator: A,
+    formatOptions: List<FormatOption>,
+): A {
     val absInterval = abs(interval)
-    val accumulator: String = if (interval >= 0) "" else "-"
+    val newAccumulator: A =
+        if (interval < 0) accumulator.plus("-") else accumulator
 
-    return reduceInterval(absInterval, accumulator, formatOptions)
+    return reduceInterval(absInterval, newAccumulator, formatOptions)
 }
 
-private fun updateTimer(origin: Long, now: Long): List<String> {
+private fun <A : Accumulate<A>> update(
+    accumulators: List<A>,
+    origin: Long,
+    now: Long,
+): List<A> {
     val interval: Long = origin - now
     val formatOptions: List<FormatOption> = listOf(
         FormatOption.Day,
@@ -92,17 +150,26 @@ private fun updateTimer(origin: Long, now: Long): List<String> {
         FormatOption.Second,
     )
 
-    return listOf(convert(interval, formatOptions))
+    return accumulators.map { accumulator: A ->
+        convert(
+            interval,
+            accumulator,
+            formatOptions
+        )
+    }
 }
 
 fun ktTimers(origins: Origins): List<List<String>> {
     val now: Long = System.currentTimeMillis()
+    val updateAccumulators: (Long) -> List<Accumulator> =
+        { origin ->
+            val accumulators: List<Accumulator> = listOf(Accumulator(String()))
+            update(accumulators, origin, now)
+        }
 
-    val result: List<List<String>> = origins.kt.map { origin ->
-        updateTimer(origin, now)
+    return origins.kt.map(updateAccumulators).map { accumulators ->
+        accumulators.map { acc: Accumulator -> acc.inner }
     }
-
-    return result
 }
 
 fun hashName(timerName: String): String {
