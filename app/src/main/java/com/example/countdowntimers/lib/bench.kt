@@ -3,10 +3,23 @@ package com.example.countdowntimers.lib
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import uniffi.cd_android.updateTimers
 import kotlin.time.measureTime
+
+fun rsWrapper(
+    updater: (Long, List<Long>) -> List<List<String>>
+): (Origins) -> List<List<String>> {
+    return { origins: Origins ->
+        val now: Long = System.currentTimeMillis()
+        updater(now, origins.kt)
+    }
+}
+
+val rsTimers: (Origins) -> List<List<String>> = rsWrapper(::updateTimers)
 
 data class Results(
     val kt: Long,
+    val rs: Long,
 )
 
 private fun seed(): Origins {
@@ -37,7 +50,8 @@ class BenchViewModel {
         val origins = seed()
 
         val ktAvg = bench1000(func = ::ktTimers, data = origins)
+        val rsAvg = bench1000(func = rsTimers, data = origins)
 
-        _resultsFlow.value = Results(ktAvg)
+        _resultsFlow.value = Results(ktAvg, rsAvg)
     }
 }

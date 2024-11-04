@@ -7,3 +7,13 @@ captures/
 .externalNativeBuild
 .cxx
 local.properties
+
+release/
+
+target/
+cd-core/
+Cargo.lock
+# You would have to make your own
+config.toml
+
+uniffi/

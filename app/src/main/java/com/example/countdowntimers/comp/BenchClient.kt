@@ -6,11 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.example.countdowntimers.lib.BenchViewModel
-import com.example.countdowntimers.lib.Results
 
-fun formatKt(results: Results?): String {
+fun formatCompose(results: Long?): String {
     return if (results != null) "${
-        results.kt.toString().padStart(7)
+        results.toString().padStart(7)
     } microseconds average over 1000 runs" else "-"
 }
 
@@ -20,7 +19,10 @@ fun BenchClient(viewModel: BenchViewModel) {
 
     Column {
         Text(text = "Kotlin")
-        Text(text = formatKt(results.value))
+        Text(text = formatCompose(results.value?.kt))
+
+        Text(text = "Rust")
+        Text(text = formatCompose(results.value?.rs))
     }
 
     Button(onClick = viewModel::bench) {

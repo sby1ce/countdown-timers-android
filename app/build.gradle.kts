@@ -1,16 +1,72 @@
+import com.android.build.gradle.tasks.MergeSourceSetFolders
+import com.nishtahir.CargoBuildTask
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.mozilla.rust) apply true
+}
+
+cargo {
+    module = "../countdown-rs"
+    libname = "cd_android"
+    verbose = true
+    targets = listOf("arm64", "x86_64")
+    prebuiltToolchains = true
+    profile = "release"
+    apiLevel = 24
+}
+
+val task = tasks.register<Exec>("uniffiBindgen") {
+    workingDir = file("${project.rootDir}/countdown-rs/cd-android")
+    val libs = "${project.rootDir}/app/build/rustJniLibs/android/" +
+            "arm64-v8a/libcd_android.so"
+    commandLine(
+        "cargo",
+        "run",
+        "--bin",
+        "uniffi-bindgen",
+        "generate",
+        "--library",
+        libs,
+        "--language",
+        "kotlin",
+        "--out-dir",
+        layout.buildDirectory.dir("generated/kotlin").get().asFile.path
+    )
+}
+
+project.afterEvaluate {
+    tasks.withType(CargoBuildTask::class).forEach { buildTask ->
+        tasks.withType(MergeSourceSetFolders::class).configureEach {
+            this.inputs.dir(
+                layout.buildDirectory.dir(
+                    "rustJniLibs" +
+                            File.separatorChar + buildTask.toolchain!!.folder
+                )
+            )
+            this.dependsOn(buildTask)
+        }
+    }
+}
+
+tasks.preBuild.configure {
+    dependsOn.add(tasks.withType(CargoBuildTask::class.java))
+    dependsOn.add(task)
 }
 
 android {
     namespace = "com.example.countdowntimers"
-    compileSdk = 34
+    compileSdk = 35
+    ndkVersion = "28.0.12433566"
+    sourceSets {
+        getByName("main").java.srcDir("build/generated/kotlin")
+    }
 
     defaultConfig {
         applicationId = "com.example.countdowntimers"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -61,6 +117,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.storage)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.jna) {
+        artifact {
+            extension = "aar"
+            type = "aar"
+        }
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -78,7 +78,7 @@ private interface Accumulate<out A : Accumulate<A>> {
     fun plus(element: String): A
 }
 
-private class Accumulator(
+private data class Accumulator(
     val inner: String,
 ) : Accumulate<Accumulator> {
     override fun accumulate(
