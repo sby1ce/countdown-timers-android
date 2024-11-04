@@ -1,3 +1,8 @@
+/*
+Copyright 2024 sby1ce
+
+SPDX-License-Identifier: CC0-1.0
+*/
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
