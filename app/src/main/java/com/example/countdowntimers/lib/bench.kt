@@ -7,13 +7,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 package com.example.countdowntimers.lib
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import uniffi.cd_android.updateTimers
 import kotlin.time.measureTime
 
 fun rsWrapper(
-    updater: (Long, List<Long>) -> List<List<String>>
+    updater: (Long, List<Long>) -> List<List<String>>,
 ): (Origins) -> List<List<String>> {
     return { origins: Origins ->
         val now: Long = System.currentTimeMillis()
@@ -48,11 +52,11 @@ fun bench1000(func: (Origins) -> List<List<String>>, data: Origins): Long {
     return microseconds
 }
 
-class BenchViewModel {
+class BenchViewModel : ViewModel() {
     private val _resultsFlow = MutableStateFlow<Results?>(null)
     val resultsFlow = _resultsFlow.asStateFlow()
 
-    fun bench() {
+    fun bench() = viewModelScope.launch(Dispatchers.Default) {
         val origins = seed()
 
         val ktAvg = bench1000(func = ::ktTimers, data = origins)
