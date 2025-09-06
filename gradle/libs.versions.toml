@@ -1,4 +1,4 @@
-# Copyright 2024 sby1ce
+# Copyright 2025 sby1ce
 #
 # SPDX-License-Identifier: CC0-1.0
 

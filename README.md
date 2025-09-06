@@ -1,5 +1,5 @@
 <!--
-Copyright 2024 sby1ce
+Copyright 2025 sby1ce
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
@@ -21,6 +21,10 @@ as well as Android Studio NDK.
 At the time of writing, see if you have NDK installed in Android Studio
 File -> Settings -> Languages & Frameworks ->
 Android SDK -> SDK Tools -> NDK (Side by side)
+
+>[!NOTE]
+> library-wrapper in NDK uses Python `pipes` library which was removed in Python 3.13
+> At the time of writing in order to build Rust from Gradle you need to downgrade global Python <3.13
 
 # Licences
 
