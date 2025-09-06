@@ -191,55 +191,6 @@ fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
         ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
 }
 
-private fun origins(timers: List<ITimer>): Origins {
+fun origins(timers: List<ITimer>): Origins {
     return Origins(timers.map { timer -> timer.origin })
-}
-
-class TimerViewModel {
-    private val _timersFlow = MutableStateFlow<List<ITimer>>(emptyList())
-    val timersFlow: StateFlow<List<ITimer>> = _timersFlow.asStateFlow()
-
-    private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
-    val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
-
-    // Start a coroutine to update the renders periodically
-    init {
-        _timersFlow.value = listOf(
-            ITimer(key = "timer1", name = "Timer 1", origin = 0),
-            ITimer(key = "timer2", name = "Timer 2", origin = 10000),
-        )
-
-        CoroutineScope(Dispatchers.Main).launch {
-            while (true) {
-                _rendersFlow.value = ktTimers(origins(_timersFlow.value))
-                delay(1000)
-            }
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    fun addTimer(
-        name: String, date: DatePickerState, time: TimePickerState,
-    ): String? {
-        if (name.isEmpty()) {
-            return "Timer name should have name"
-        } else if (date.selectedDateMillis == null) {
-            return "Entered date is invalid"
-        } else if (timersFlow.value.any { timer -> timer.name == name }) {
-            return "Timer with the same name already exists"
-        }
-
-        _timersFlow.value = timersFlow.value + ITimer(
-            key = hashName(name),
-            name = name,
-            origin = getOrigin(date, time)
-        )
-
-        return null
-    }
-
-    fun popTimer(id: Int) {
-        _timersFlow.value =
-            timersFlow.value.filterIndexed { index, _ -> index != id }
-    }
 }

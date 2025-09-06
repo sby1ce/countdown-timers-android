@@ -11,7 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.example.countdowntimers.lib.BenchViewModel
+import com.example.countdowntimers.ui.viewmodel.BenchViewModel
 
 fun formatCompose(results: Long?): String {
     return if (results != null) "${

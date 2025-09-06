@@ -64,7 +64,7 @@ tasks.preBuild.configure {
 android {
     namespace = "com.example.countdowntimers"
     compileSdk = 35
-    ndkVersion = "28.0.12433566"
+    ndkVersion = "29.0.14033849"
     sourceSets {
         getByName("main").java.srcDir("build/generated/kotlin")
     }
