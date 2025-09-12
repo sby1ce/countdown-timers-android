@@ -12,6 +12,7 @@ import com.example.countdowntimers.lib.ktTimers
 import com.example.countdowntimers.lib.origins
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,9 +31,12 @@ class TimerViewModel {
     private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
     val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
 
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     // Start a coroutine to update the renders periodically
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
+            // ticker API is obsolete, just use while true
             while (true) {
                 _rendersFlow.value = ktTimers(origins(_timersFlow.value))
                 delay(1000)
