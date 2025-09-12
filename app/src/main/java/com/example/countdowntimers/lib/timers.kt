@@ -18,7 +18,7 @@ data class Origins(
 /**
  * Originally ITimer in TypeScript
  */
-data class ITimer(
+data class Timer(
     val key: String,
     val name: String,
     val origin: Long,
@@ -187,6 +187,6 @@ fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
         ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
 }
 
-fun origins(timers: List<ITimer>): Origins {
+fun origins(timers: List<Timer>): Origins {
     return Origins(timers.map { timer -> timer.origin })
 }

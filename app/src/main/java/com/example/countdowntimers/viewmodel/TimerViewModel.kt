@@ -5,7 +5,7 @@ import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import com.example.countdowntimers.R
-import com.example.countdowntimers.lib.ITimer
+import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.lib.getOrigin
 import com.example.countdowntimers.lib.hashName
 import com.example.countdowntimers.lib.ktTimers
@@ -19,19 +19,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class TimerViewModel {
-    private val _timersFlow = MutableStateFlow<List<ITimer>>(listOf(
-        ITimer(key = "timer1", name = "Timer 1", origin = 0),
-        ITimer(key = "timer2", name = "Timer 2", origin = 10000),
-    ))
-    val timersFlow: StateFlow<List<ITimer>> = _timersFlow.asStateFlow()
+    private val _timersFlow = MutableStateFlow<List<Timer>>(
+        listOf(
+            Timer(key = "timer1", name = "Timer 1", origin = 0),
+            Timer(key = "timer2", name = "Timer 2", origin = 10000),
+        )
+    )
+    val timersFlow: StateFlow<List<Timer>> = _timersFlow.asStateFlow()
 
     private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
     val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
 
     // Start a coroutine to update the renders periodically
     init {
-       // _timersFlow.value =
-
         CoroutineScope(Dispatchers.Main).launch {
             while (true) {
                 _rendersFlow.value = ktTimers(origins(_timersFlow.value))
@@ -53,7 +53,7 @@ class TimerViewModel {
             return R.string.add_error_duplicate
         }
 
-        _timersFlow.value = timersFlow.value + ITimer(
+        _timersFlow.value = timersFlow.value + Timer(
             key = hashName(name),
             name = name,
             origin = getOrigin(date, time)

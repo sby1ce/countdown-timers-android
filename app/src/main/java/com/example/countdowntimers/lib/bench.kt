@@ -33,20 +33,14 @@ fun seed(): Origins {
 
 fun bench1000(func: (Origins) -> List<List<String>>, data: Origins): Long {
     val microseconds = measureTime {
-//        for (i in 0..1000) {
-//            val renders: List<List<String>> = func(data)
-//            if (
-//                !renders.all { row -> row.all { v -> v.isNotEmpty() } }
-//            ) {
-//                Log.d("bench", "Something went wrong when benching")
-//            }
-//        }
-
-        (0..1000).asSequence()
-            .map { _ -> func(data) }
-            .filter { renders -> !renders.all { row -> row.all { v -> v.isNotEmpty() } } }
-            .forEach { _ -> Log.d("bench", "Something went wrong when benching") }
-
+        (0..1000).forEach { _ ->
+            val renders: List<List<String>> = func(data)
+            if (
+                !renders.all { row -> row.all { v -> v.isNotEmpty() } }
+            ) {
+                Log.d("bench", "Something went wrong when benching")
+            }
+        }
     }.inWholeMicroseconds
 
     return microseconds

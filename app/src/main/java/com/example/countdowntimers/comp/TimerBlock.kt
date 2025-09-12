@@ -19,12 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.countdowntimers.lib.ITimer
+import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.viewmodel.TimerViewModel
 
 private fun timerProps(
     viewModel: TimerViewModel,
-    timers: List<ITimer>,
+    timers: List<Timer>,
     renders: List<List<String>>,
 ): List<TimerProps> {
     return (timers zip renders).mapIndexed { id, (timer, origin) ->
