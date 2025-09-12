@@ -6,6 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 package com.example.countdowntimers.comp
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.countdowntimers.viewmodel.TimerViewModel
@@ -57,14 +59,15 @@ fun AddTimer(viewModel: TimerViewModel) {
     val date = rememberDatePickerState()
     val time = rememberTimePickerState()
 
-    var errorText by remember { mutableStateOf("") }
+    @StringRes
+    var errorText: Int? by remember { mutableStateOf(null) }
 
     val addTimer: () -> Unit = {
         // Wild side effects
         errorText = viewModel.addTimer(name, date, time) ?: run {
             // Clearing the form
             name = ""
-            ""
+            null
         }
     }
 
@@ -111,8 +114,8 @@ fun AddTimer(viewModel: TimerViewModel) {
             },
             readOnly = true,
         )
-        if (errorText.isNotEmpty()) {
-            Text(text = errorText)
+        errorText?.let { id ->
+            Text(text = stringResource(id))
         }
         Row {
             FilledTonalButton(
