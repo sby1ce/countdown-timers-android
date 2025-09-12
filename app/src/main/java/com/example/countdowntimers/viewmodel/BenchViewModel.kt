@@ -1,4 +1,4 @@
-package com.example.countdowntimers.ui.viewmodel
+package com.example.countdowntimers.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package com.example.countdowntimers.ui.viewmodel
+package com.example.countdowntimers.viewmodel
 
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api

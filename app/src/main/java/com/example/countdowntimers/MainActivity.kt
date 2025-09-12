@@ -32,8 +32,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.countdowntimers.comp.BenchClient
 import com.example.countdowntimers.comp.TimerBlock
-import com.example.countdowntimers.ui.viewmodel.BenchViewModel
-import com.example.countdowntimers.ui.viewmodel.TimerViewModel
+import com.example.countdowntimers.viewmodel.BenchViewModel
+import com.example.countdowntimers.viewmodel.TimerViewModel
 import com.example.countdowntimers.ui.theme.CountdownTimersTheme
 
 enum class Screens {
