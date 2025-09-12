@@ -6,7 +6,6 @@ SPDX-License-Identifier: CC0-1.0
 
 package com.example.countdowntimers.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

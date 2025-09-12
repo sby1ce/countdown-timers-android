@@ -9,19 +9,15 @@ package com.example.countdowntimers.lib
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 data class Origins(
     val kt: List<Long>,
 )
 
+/**
+ * Originally ITimer in TypeScript
+ */
 data class ITimer(
     val key: String,
     val name: String,

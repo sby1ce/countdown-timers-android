@@ -7,12 +7,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 package com.example.countdowntimers.lib
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import uniffi.cd_android.updateTimers
 import kotlin.time.measureTime
 
