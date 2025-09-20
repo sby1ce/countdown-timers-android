@@ -1,9 +1,6 @@
 package com.example.countdowntimers.viewmodel
 
 import androidx.annotation.StringRes
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TimePickerState
 import com.example.countdowntimers.R
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.model.TimerModel
@@ -43,20 +40,19 @@ class TimerViewModel {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @StringRes
     fun addTimer(
-        name: String, date: DatePickerState, time: TimePickerState,
+        name: String, dateMillis: Long?, hour: Int, minute: Int,
     ): Int? {
         if (name.isEmpty()) {
             return R.string.add_error_name
-        } else if (date.selectedDateMillis == null) {
+        } else if (dateMillis == null) {
             return R.string.add_error_date
         } else if (timersFlow.value.hasName(name)) {
             return R.string.add_error_duplicate
         }
 
-        _timersFlow.value = timersFlow.value.addTimer(name, date, time)
+        _timersFlow.value = timersFlow.value.addTimer(name, dateMillis, hour, minute)
 
         return null
     }

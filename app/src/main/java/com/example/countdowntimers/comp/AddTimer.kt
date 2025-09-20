@@ -63,8 +63,11 @@ fun AddTimer(viewModel: TimerViewModel) {
     var errorText: Int? by remember { mutableStateOf(null) }
 
     val addTimer: () -> Unit = {
+        val dateMillis = date.selectedDateMillis
+        val hour = time.hour
+        val minute = time.minute
         // Wild side effects
-        errorText = viewModel.addTimer(name, date, time) ?: run {
+        errorText = viewModel.addTimer(name, dateMillis, hour, minute) ?: run {
             // Clearing the form
             name = ""
             null

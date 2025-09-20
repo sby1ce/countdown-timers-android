@@ -1,18 +1,13 @@
 package com.example.countdowntimers.model
 
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TimePickerState
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.lib.hashName
 import com.example.countdowntimers.lib.ktTimers
 import com.example.countdowntimers.lib.origins
 import kotlin.collections.plus
 
-@OptIn(ExperimentalMaterial3Api::class)
-private fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
-    return (date.selectedDateMillis
-        ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
+private fun getOrigin(dateMillis: Long, hour: Int, minute: Int): Long {
+    return dateMillis + hour * 60 * 60 * 1000 + minute * 60 * 1000
 }
 
 class TimerModel(private val state: List<Timer>) {
@@ -20,14 +15,13 @@ class TimerModel(private val state: List<Timer>) {
         return state.any { timer -> timer.name == name }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     fun addTimer(
-        name: String, date: DatePickerState, time: TimePickerState,
+        name: String, dateMillis: Long, hour: Int, minute: Int,
     ): TimerModel {
         return TimerModel(state + Timer(
             key = hashName(name),
             name = name,
-            origin = getOrigin(date, time)
+            origin = getOrigin(dateMillis, hour, minute),
         ))
     }
 
