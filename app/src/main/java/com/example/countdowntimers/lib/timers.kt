@@ -181,12 +181,6 @@ fun hashName(timerName: String): String {
     return "timer${hash}"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-fun getOrigin(date: DatePickerState, time: TimePickerState): Long {
-    return (date.selectedDateMillis
-        ?: 0) + time.hour * 60 * 60 * 1000 + time.minute * 60 * 1000
-}
-
 fun origins(timers: List<Timer>): Origins {
     return Origins(timers.map { timer -> timer.origin })
 }
