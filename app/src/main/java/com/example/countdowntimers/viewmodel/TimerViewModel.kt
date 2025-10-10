@@ -2,6 +2,8 @@ package com.example.countdowntimers.viewmodel
 
 import androidx.annotation.StringRes
 import com.example.countdowntimers.R
+import com.example.countdowntimers.lib.Clock
+import com.example.countdowntimers.lib.SystemClock
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.model.TimerModel
 import kotlinx.coroutines.CoroutineScope
@@ -12,9 +14,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-class TimerViewModel {
-    private val _timersFlow = MutableStateFlow<TimerModel>(
+class TimerViewModel(
+    context: CoroutineContext = Dispatchers.Main,
+    clock: Clock = SystemClock(),
+) {
+    private val _timersFlow = MutableStateFlow(
         TimerModel(
             listOf(
                 Timer(key = "timer1", name = "Timer 1", origin = 0),
@@ -27,14 +33,15 @@ class TimerViewModel {
     private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
     val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
 
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val scope = CoroutineScope(context + SupervisorJob())
 
     // Start a coroutine to update the renders periodically
     init {
         scope.launch {
             // ticker API is obsolete, just use while true
             while (true) {
-                _rendersFlow.value = _timersFlow.value.render()
+                val now = clock.now()
+                _rendersFlow.value = _timersFlow.value.render(now)
                 delay(1000)
             }
         }

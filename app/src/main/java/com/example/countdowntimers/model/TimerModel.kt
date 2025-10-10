@@ -29,8 +29,8 @@ data class TimerModel(private val state: List<Timer>) {
         return TimerModel(state.filterIndexed { index, _ -> index != idx })
     }
 
-    fun render(): List<List<String>> {
-        return ktTimers(origins(state))
+    fun render(now: Long): List<List<String>> {
+        return ktTimers(origins(state), now)
     }
 
     fun names(): List<String> {

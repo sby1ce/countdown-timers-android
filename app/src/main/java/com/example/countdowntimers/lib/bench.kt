@@ -12,14 +12,13 @@ import kotlin.time.measureTime
 
 fun rsWrapper(
     updater: (Long, List<Long>) -> List<List<String>>,
-): (Origins) -> List<List<String>> {
-    return { origins: Origins ->
-        val now: Long = System.currentTimeMillis()
+): (Origins, Long) -> List<List<String>> {
+    return { origins: Origins, now: Long ->
         updater(now, origins.kt)
     }
 }
 
-val rsTimers: (Origins) -> List<List<String>> = rsWrapper(::updateTimers)
+val rsTimers: (Origins, Long) -> List<List<String>> = rsWrapper(::updateTimers)
 
 data class Results(
     val kt: Long,
@@ -31,10 +30,15 @@ fun seed(): Origins {
     return Origins(kt)
 }
 
-fun bench1000(func: (Origins) -> List<List<String>>, data: Origins): Long {
+fun bench1000(
+    func: (Origins, Long) -> List<List<String>>,
+    data: Origins,
+    clock: Clock,
+): Long {
     val microseconds = measureTime {
         (0..1000).forEach { _ ->
-            val renders: List<List<String>> = func(data)
+            val now = clock.now()
+            val renders: List<List<String>> = func(data, now)
             if (
                 !renders.all { row -> row.all { v -> v.isNotEmpty() } }
             ) {

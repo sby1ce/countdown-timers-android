@@ -35,7 +35,7 @@ class TimerModelUnitTest {
 
     @Test
     fun testRendering() {
-        val renders = model.render()
+        val renders = model.render(1)
         assertEquals(1, renders.size)
         assertEquals(1, renders[0].size)
         assert(renders[0][0].startsWith('-'))

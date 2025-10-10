@@ -6,14 +6,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 package com.example.countdowntimers.lib
 
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TimePickerState
 import kotlin.math.abs
 
 data class Origins(
     val kt: List<Long>,
 )
+
+interface Clock {
+    fun now(): Long
+}
+
+class SystemClock : Clock {
+    override fun now(): Long = System.currentTimeMillis()
+}
 
 /**
  * Originally ITimer in TypeScript
@@ -53,19 +58,20 @@ private enum class FormatOption {
     Second,
     Millisecond;
 
-    fun toTimeUnit(): TimeUnit {
-        return when (this) {
-            Week -> timeUnits[0]
-            Day -> timeUnits[1]
-            Hour -> timeUnits[2]
-            Minute -> timeUnits[3]
-            Second -> timeUnits[4]
-            Millisecond -> timeUnits[5]
-        }
+    fun toTimeUnit(): TimeUnit = when (this) {
+        Week -> timeUnits[0]
+        Day -> timeUnits[1]
+        Hour -> timeUnits[2]
+        Minute -> timeUnits[3]
+        Second -> timeUnits[4]
+        Millisecond -> timeUnits[5]
     }
 }
 
-fun calculateInterval(interval: Long, divisor: Long): Pair<Long, String> {
+private fun calculateInterval(
+    interval: Long,
+    divisor: Long,
+): Pair<Long, String> {
     val newInterval: Long = interval % divisor
     val unitCount: Long = interval / divisor
     return newInterval to unitCount.toString()
@@ -161,8 +167,7 @@ private fun <A : Accumulate<A>> update(
     }
 }
 
-fun ktTimers(origins: Origins): List<List<String>> {
-    val now: Long = System.currentTimeMillis()
+fun ktTimers(origins: Origins, now: Long): List<List<String>> {
     val updateAccumulators: (Long) -> List<Accumulator> =
         { origin ->
             val accumulators: List<Accumulator> = listOf(Accumulator(String()))
