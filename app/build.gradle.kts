@@ -6,9 +6,11 @@ SPDX-License-Identifier: CC0-1.0
 
 import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.nishtahir.CargoBuildTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.mozilla.rust) apply true
 }
@@ -61,6 +63,12 @@ tasks.preBuild.configure {
     dependsOn.add(task)
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("1.8")
+    }
+}
+
 android {
     namespace = "com.example.countdowntimers"
     compileSdk = 35
@@ -94,9 +102,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
