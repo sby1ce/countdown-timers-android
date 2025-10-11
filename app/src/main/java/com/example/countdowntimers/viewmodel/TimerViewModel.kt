@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -39,7 +40,7 @@ class TimerViewModel(
     init {
         scope.launch {
             // ticker API is obsolete, just use while true
-            while (true) {
+            while (isActive) {
                 val now = clock.now()
                 _rendersFlow.value = _timersFlow.value.render(now)
                 delay(1000)

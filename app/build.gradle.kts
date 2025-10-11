@@ -71,7 +71,7 @@ kotlin {
 
 android {
     namespace = "com.example.countdowntimers"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "29.0.14033849"
     sourceSets {
         getByName("main").java.srcDir("build/generated/kotlin")
@@ -80,7 +80,7 @@ android {
     defaultConfig {
         applicationId = "com.example.countdowntimers"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -135,6 +135,7 @@ dependencies {
         }
     }
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
