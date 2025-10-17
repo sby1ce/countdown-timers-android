@@ -56,7 +56,8 @@ fun AddTimer(viewModel: TimerViewModel) {
     var showTimeModal by remember { mutableStateOf(false) }
 
     var name by remember { mutableStateOf("") }
-    val date = rememberDatePickerState()
+    // Set current date as default
+    val date = rememberDatePickerState(initialSelectedDateMillis = System.currentTimeMillis())
     val time = rememberTimePickerState()
 
     @StringRes
