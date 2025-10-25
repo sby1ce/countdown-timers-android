@@ -12,7 +12,7 @@ class AddTimerTest {
 
     @Test
     fun addTimer_uiTest() {
-        val viewModel = TimerViewModel()
+        val viewModel = TimerViewModel(clock = TimerBlockTest.FakeClock())
 
         composeTestRule.setContent {
             AddTimer(viewModel)

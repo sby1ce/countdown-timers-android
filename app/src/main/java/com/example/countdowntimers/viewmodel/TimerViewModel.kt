@@ -1,11 +1,13 @@
 package com.example.countdowntimers.viewmodel
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.ViewModel
 import com.example.countdowntimers.R
 import com.example.countdowntimers.lib.Clock
 import com.example.countdowntimers.lib.SystemClock
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.model.TimerModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,12 +17,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class TimerViewModel(
+@HiltViewModel
+class TimerViewModel @Inject constructor(
     context: CoroutineContext = Dispatchers.Main,
-    clock: Clock = SystemClock(),
-) {
+    private val clock: Clock,
+) : ViewModel() {
     private val _timersFlow = MutableStateFlow(
         TimerModel(
             listOf(

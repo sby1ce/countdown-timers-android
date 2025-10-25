@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,6 +36,7 @@ import com.example.countdowntimers.comp.TimerBlock
 import com.example.countdowntimers.viewmodel.BenchViewModel
 import com.example.countdowntimers.viewmodel.TimerViewModel
 import com.example.countdowntimers.ui.theme.CountdownTimersTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 enum class Screens {
     Index,
@@ -50,13 +52,13 @@ fun IndexPage() {
             modifier = Modifier.padding(8.dp),
         )
 
-        TimerBlock(TimerViewModel())
+        TimerBlock(hiltViewModel<TimerViewModel>())
     }
 }
 
 @Composable
 fun BenchPage() {
-    val viewModel = BenchViewModel()
+    val viewModel = hiltViewModel<BenchViewModel>()
 
     Column(modifier = Modifier.padding(8.dp)) {
         Text(text = "Benchmarks")
@@ -119,6 +121,7 @@ fun Content() {
     }
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

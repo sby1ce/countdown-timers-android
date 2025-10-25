@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.mozilla.rust) apply true
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 cargo {
@@ -112,6 +114,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            pickFirsts += "META-INF/gradle/incremental.annotation.processors"
         }
     }
 }
@@ -134,6 +137,10 @@ dependencies {
             type = "aar"
         }
     }
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
