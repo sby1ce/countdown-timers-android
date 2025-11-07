@@ -1,6 +1,7 @@
 package com.example.countdowntimers.model
 
 import com.example.countdowntimers.lib.Timer
+import com.example.countdowntimers.lib.TimerRepository
 import com.example.countdowntimers.lib.hashName
 import com.example.countdowntimers.lib.ktTimers
 import com.example.countdowntimers.lib.origins
@@ -10,23 +11,25 @@ private fun getOrigin(dateMillis: Long, hour: Int, minute: Int): Long {
     return dateMillis + hour * 60 * 60 * 1000 + minute * 60 * 1000
 }
 
-data class TimerModel(private val state: List<Timer>) {
-    fun hasName(name: String): Boolean {
-        return state.any { timer -> timer.name == name }
+class TimerModel(private val timerRepository: TimerRepository) {
+    suspend fun hasName(name: String): Boolean {
+        return timerRepository.hasTimer(hashName(name))
     }
 
-    fun addTimer(
+    suspend fun addTimer(
         name: String, dateMillis: Long, hour: Int, minute: Int,
     ): TimerModel {
-        return TimerModel(state + Timer(
+        timerRepository.insertTimer(Timer(
             key = hashName(name),
             name = name,
             origin = getOrigin(dateMillis, hour, minute),
         ))
+        return this
     }
 
-    fun popTimer(idx: Int): TimerModel {
-        return TimerModel(state.filterIndexed { index, _ -> index != idx })
+    suspend fun popTimer(idx: Int): TimerModel {
+        timerRepository.deleteTimer()
+        return this
     }
 
     fun render(now: Long): List<List<String>> {

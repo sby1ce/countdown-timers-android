@@ -6,6 +6,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 package com.example.countdowntimers.lib
 
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 
 data class Origins(
@@ -23,7 +32,9 @@ class SystemClock : Clock {
 /**
  * Originally ITimer in TypeScript
  */
+@Entity(tableName = "timers")
 data class Timer(
+    @PrimaryKey(autoGenerate = false)
     val key: String,
     val name: String,
     val origin: Long,

@@ -1,9 +1,13 @@
 import com.example.countdowntimers.R
 import com.example.countdowntimers.lib.Clock
+import com.example.countdowntimers.lib.Timer
+import com.example.countdowntimers.lib.TimerRepository
 import com.example.countdowntimers.viewmodel.TimerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
@@ -18,6 +22,7 @@ class TimerViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
+    private val fakeRepository = FakeRepository()
 
     private lateinit var fakeClock: FakeClock
     private lateinit var viewModel: TimerViewModel
@@ -25,7 +30,7 @@ class TimerViewModelTest {
     @Before
     fun setUp() {
         fakeClock = FakeClock()
-        viewModel = TimerViewModel(testDispatcher, fakeClock)
+        viewModel = TimerViewModel(testDispatcher, fakeRepository, fakeClock)
     }
 
     @After
@@ -78,5 +83,23 @@ class TimerViewModelTest {
     class FakeClock : Clock {
         private var currentTime = 0L
         override fun now(): Long = currentTime
+    }
+
+    class FakeRepository : TimerRepository {
+        val state = mutableListOf<Timer>()
+
+        override fun getTimers(): Flow<List<Timer>> = flowOf(state)
+
+        override suspend fun hasTimer(key: String): Boolean {
+            state.any { it.key == key }
+        }
+
+        override suspend fun insertTimer(timer: Timer) {
+            state.add(timer)
+        }
+
+        override suspend fun deleteTimer(timer: Timer) {
+            state.drop(state.indexOf(timer))
+        }
     }
 }
