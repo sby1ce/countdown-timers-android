@@ -3,6 +3,8 @@ package com.example.countdowntimers
 import android.app.Application
 import com.example.countdowntimers.lib.Clock
 import com.example.countdowntimers.lib.SystemClock
+import com.example.countdowntimers.lib.Timer
+import com.example.countdowntimers.model.TimerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,4 +23,12 @@ object TimersModule {
     fun provideClock(): Clock = SystemClock()
     @Provides
     fun providesContext(): CoroutineContext = Dispatchers.Main
+
+    @Provides
+    fun providesRepository(): TimerRepository = TimerRepository(
+        listOf(
+            Timer(key = 1, name = "Timer 1", origin = 0),
+            Timer(key = 2, name = "Timer 2", origin = 10000),
+        )
+    )
 }

@@ -1,6 +1,7 @@
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.countdowntimers.comp.AddTimer
+import com.example.countdowntimers.model.TimerRepository
 import com.example.countdowntimers.viewmodel.TimerViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -12,7 +13,7 @@ class AddTimerTest {
 
     @Test
     fun addTimer_uiTest() {
-        val viewModel = TimerViewModel(clock = TimerBlockTest.FakeClock())
+        val viewModel = TimerViewModel(TimerRepository(emptyList()), clock = TimerBlockTest.FakeClock())
 
         composeTestRule.setContent {
             AddTimer(viewModel)

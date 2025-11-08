@@ -4,9 +4,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import com.example.countdowntimers.R
 import com.example.countdowntimers.lib.Clock
-import com.example.countdowntimers.lib.SystemClock
 import com.example.countdowntimers.lib.Timer
-import com.example.countdowntimers.model.TimerModel
+import com.example.countdowntimers.model.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,18 +21,12 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
+    repository: TimerRepository,
     context: CoroutineContext = Dispatchers.Main,
     private val clock: Clock,
 ) : ViewModel() {
-    private val _timersFlow = MutableStateFlow(
-        TimerModel(
-            listOf(
-                Timer(key = "timer1", name = "Timer 1", origin = 0),
-                Timer(key = "timer2", name = "Timer 2", origin = 10000),
-            )
-        )
-    )
-    val timersFlow: StateFlow<TimerModel> = _timersFlow.asStateFlow()
+    private val _timersFlow = MutableStateFlow(repository)
+    val timersFlow: StateFlow<TimerRepository> = _timersFlow.asStateFlow()
 
     private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
     val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()

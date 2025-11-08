@@ -1,17 +1,17 @@
 package com.example.countdowntimers
 
 import com.example.countdowntimers.lib.Timer
-import com.example.countdowntimers.model.TimerModel
+import com.example.countdowntimers.model.TimerRepository
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class TimerModelUnitTest {
-    private lateinit var model: TimerModel
+    private lateinit var model: TimerRepository
 
     @Before
     fun setup() {
-        model = TimerModel(listOf(Timer("1", "test", 0L)))
+        model = TimerRepository(listOf(Timer(1, "test", 0L)))
     }
 
     @Test

@@ -1,5 +1,6 @@
 import com.example.countdowntimers.R
 import com.example.countdowntimers.lib.Clock
+import com.example.countdowntimers.model.TimerRepository
 import com.example.countdowntimers.viewmodel.TimerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +26,7 @@ class TimerViewModelTest {
     @Before
     fun setUp() {
         fakeClock = FakeClock()
-        viewModel = TimerViewModel(testDispatcher, fakeClock)
+        viewModel = TimerViewModel(TimerRepository(emptyList()), testDispatcher, fakeClock)
     }
 
     @After

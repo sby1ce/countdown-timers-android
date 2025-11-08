@@ -24,7 +24,7 @@ class SystemClock : Clock {
  * Originally ITimer in TypeScript
  */
 data class Timer(
-    val key: String,
+    val key: Int,
     val name: String,
     val origin: Long,
 )
@@ -179,11 +179,11 @@ fun ktTimers(origins: Origins, now: Long): List<List<String>> {
     }
 }
 
-fun hashName(timerName: String): String {
-    val hash = timerName.fold(
+fun hashName(timerName: String): Int {
+    val hash: Int = timerName.fold(
         0,
     ) { hash, char -> 0 or (31 * hash + char.code) }
-    return "timer${hash}"
+    return hash
 }
 
 fun origins(timers: List<Timer>): Origins {

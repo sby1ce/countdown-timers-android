@@ -10,23 +10,23 @@ private fun getOrigin(dateMillis: Long, hour: Int, minute: Int): Long {
     return dateMillis + hour * 60 * 60 * 1000 + minute * 60 * 1000
 }
 
-data class TimerModel(private val state: List<Timer>) {
+class TimerRepository(private val state: List<Timer>) {
     fun hasName(name: String): Boolean {
         return state.any { timer -> timer.name == name }
     }
 
     fun addTimer(
         name: String, dateMillis: Long, hour: Int, minute: Int,
-    ): TimerModel {
-        return TimerModel(state + Timer(
+    ): TimerRepository {
+        return TimerRepository(state + Timer(
             key = hashName(name),
             name = name,
             origin = getOrigin(dateMillis, hour, minute),
         ))
     }
 
-    fun popTimer(idx: Int): TimerModel {
-        return TimerModel(state.filterIndexed { index, _ -> index != idx })
+    fun popTimer(id: Int): TimerRepository {
+        return TimerRepository(state.filter { timer -> timer.key != id })
     }
 
     fun render(now: Long): List<List<String>> {
