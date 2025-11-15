@@ -24,6 +24,7 @@ import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,18 +63,13 @@ fun AddTimer(viewModel: TimerViewModel) {
     val time = rememberTimePickerState()
 
     @StringRes
-    var errorText: Int? by remember { mutableStateOf(null) }
+    val errorText by viewModel.errorFlow.collectAsState()
 
     val addTimer: () -> Unit = {
         val dateMillis = date.selectedDateMillis
         val hour = time.hour
         val minute = time.minute
-        // Wild side effects
-        errorText = viewModel.addTimer(name, dateMillis, hour, minute) ?: run {
-            // Clearing the form
-            name = ""
-            null
-        }
+        viewModel.addTimer(name, dateMillis, hour, minute)
     }
 
     val dateModal = @Composable {

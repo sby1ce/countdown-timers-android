@@ -2,10 +2,8 @@ package com.example.countdowntimers.viewmodel
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.countdowntimers.R
-import com.example.countdowntimers.lib.Clock
-import com.example.countdowntimers.lib.Timer
-import com.example.countdowntimers.model.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,15 +19,19 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    repository: TimerRepository,
+    private val addTimerUseCase: AddTimerUseCase,
+    private val popTimerUseCase: PopTimerUseCase,
+    private val renderTimersUseCase: RenderTimersUseCase,
     context: CoroutineContext = Dispatchers.Main,
-    private val clock: Clock,
 ) : ViewModel() {
-    private val _timersFlow = MutableStateFlow(repository)
-    val timersFlow: StateFlow<TimerRepository> = _timersFlow.asStateFlow()
+    private val _rendersFlow = MutableStateFlow<List<Pair<String, List<String>>>>(emptyList())
+    val rendersFlow: StateFlow<List<Pair<String, List<String>>>> = _rendersFlow.asStateFlow()
 
-    private val _rendersFlow = MutableStateFlow<List<List<String>>>(emptyList())
-    val rendersFlow: StateFlow<List<List<String>>> = _rendersFlow.asStateFlow()
+    @StringRes
+    private val _errorFlow = MutableStateFlow<Int?>(null)
+
+    @StringRes
+    val errorFlow = _errorFlow.asStateFlow()
 
     private val scope = CoroutineScope(context + SupervisorJob())
 
@@ -38,32 +40,35 @@ class TimerViewModel @Inject constructor(
         scope.launch {
             // ticker API is obsolete, just use while true
             while (isActive) {
-                val now = clock.now()
-                _rendersFlow.value = _timersFlow.value.render(now)
+                _rendersFlow.value = renderTimersUseCase()
                 delay(1000)
             }
         }
     }
 
-    @StringRes
     fun addTimer(
         name: String, dateMillis: Long?, hour: Int, minute: Int,
-    ): Int? {
+    ) {
         if (name.isEmpty()) {
-            return R.string.add_error_name
+            _errorFlow.value = R.string.add_error_name
+            return
         } else if (dateMillis == null) {
-            return R.string.add_error_date
-        } else if (timersFlow.value.hasName(name)) {
-            return R.string.add_error_duplicate
+            _errorFlow.value = R.string.add_error_date
+            return
         }
 
-        _timersFlow.value = timersFlow.value.addTimer(name, dateMillis, hour, minute)
-
-        return null
+        viewModelScope.launch {
+            _errorFlow.value = if (addTimerUseCase(name, dateMillis, hour, minute)) {
+                null
+            } else {
+                R.string.add_error_duplicate
+            }
+        }
     }
 
     fun popTimer(id: Int) {
-        _timersFlow.value =
-            timersFlow.value.popTimer(id)
+        viewModelScope.launch {
+            popTimerUseCase(id)
+        }
     }
 }

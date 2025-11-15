@@ -2,48 +2,44 @@ package com.example.countdowntimers
 
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.model.TimerRepository
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class TimerModelUnitTest {
-    private lateinit var model: TimerRepository
+class TimerRepositoryTest {
+
+    private lateinit var repository: TimerRepository
+    private val initialTimers = listOf(
+        Timer(key = 1, name = "timer1", origin = 1000L)
+    )
 
     @Before
     fun setup() {
-        model = TimerRepository(listOf(Timer(1, "test", 0L)))
+        repository = TimerRepository(initialTimers)
     }
 
     @Test
-    fun testPresence() {
-        assert(model.hasName("test"))
+    fun addTimer_success_addsTimer() = runTest {
+        val success = repository.addTimer("newTimer", 0L, 0, 0)
+        assertTrue(success)
+
+        val timers = repository.getTimers()
+        assertTrue(timers.any { it.name == "newTimer" })
     }
 
     @Test
-    fun testAddingTimer() {
-        val new = model.addTimer("test1", 0, 0, 0)
-        assert(new.hasName("test1"))
+    fun popTimer_removesTimer() = runTest {
+        repository.popTimer(1)
+        val timers = repository.getTimers()
+        assertFalse(timers.any { it.key == 1 })
     }
 
     @Test
-    fun testRemovingTimer() {
-        val new = model.popTimer(0)
-        assert(!new.hasName("test"))
-        val empty = new.popTimer(0)
-        assertEquals(new, empty)
-    }
-
-    @Test
-    fun testRendering() {
-        val renders = model.render(1)
-        assertEquals(1, renders.size)
-        assertEquals(1, renders[0].size)
-        assert(renders[0][0].startsWith('-'))
-    }
-
-    @Test
-    fun testNameIterating() {
-        val names = model.names()
-        assertEquals(listOf("test"), names)
+    fun addTimer_duplicateName_fails() = runTest {
+        val result = repository.addTimer("timer1", 0L, 0, 0)
+        assertFalse(result)
     }
 }
+

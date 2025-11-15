@@ -25,19 +25,17 @@ import com.example.countdowntimers.viewmodel.TimerViewModel
 
 private fun timerProps(
     viewModel: TimerViewModel,
-    timers: TimerRepository,
-    renders: List<List<String>>,
+    renders: List<Pair<String, List<String>>>,
 ): List<TimerProps> {
-    return (timers.names() zip renders).mapIndexed { id, (name, origin) ->
+    return renders.mapIndexed { id, (name, origin) ->
         TimerProps(id, name, origin) { viewModel.popTimer(id) }
     }
 }
 
 @Composable
 fun TimerBlock(viewModel: TimerViewModel) {
-    val timers by viewModel.timersFlow.collectAsState()
     val renders by viewModel.rendersFlow.collectAsState()
-    val state = timerProps(viewModel, timers, renders)
+    val state = timerProps(viewModel, renders)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
