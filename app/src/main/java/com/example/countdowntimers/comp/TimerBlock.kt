@@ -20,15 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.countdowntimers.model.TimerRepository
+import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.viewmodel.TimerViewModel
 
 private fun timerProps(
     viewModel: TimerViewModel,
-    renders: List<Pair<String, List<String>>>,
+    renders: List<Pair<Timer, List<String>>>,
 ): List<TimerProps> {
-    return renders.mapIndexed { id, (name, origin) ->
-        TimerProps(id, name, origin) { viewModel.popTimer(id) }
+    return renders.map { (timer, origin) ->
+        TimerProps(timer.key, timer.name, origin) { viewModel.popTimer(timer) }
     }
 }
 

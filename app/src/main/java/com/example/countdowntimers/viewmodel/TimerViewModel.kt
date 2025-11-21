@@ -4,15 +4,14 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countdowntimers.R
+import com.example.countdowntimers.lib.Timer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -24,8 +23,10 @@ class TimerViewModel @Inject constructor(
     private val renderTimersUseCase: RenderTimersUseCase,
     context: CoroutineContext = Dispatchers.Main,
 ) : ViewModel() {
-    private val _rendersFlow = MutableStateFlow<List<Pair<String, List<String>>>>(emptyList())
-    val rendersFlow: StateFlow<List<Pair<String, List<String>>>> = _rendersFlow.asStateFlow()
+    private val _rendersFlow =
+        MutableStateFlow<List<Pair<Timer, List<String>>>>(emptyList())
+    val rendersFlow: StateFlow<List<Pair<Timer, List<String>>>> =
+        _rendersFlow.asStateFlow()
 
     @StringRes
     private val _errorFlow = MutableStateFlow<Int?>(null)
@@ -35,14 +36,12 @@ class TimerViewModel @Inject constructor(
 
     private val scope = CoroutineScope(context + SupervisorJob())
 
-    // Start a coroutine to update the renders periodically
     init {
         scope.launch {
-            // ticker API is obsolete, just use while true
-            while (isActive) {
-                _rendersFlow.value = renderTimersUseCase()
-                delay(1000)
-            }
+            renderTimersUseCase(scope)
+                .collect { render ->
+                    _rendersFlow.value = render
+                }
         }
     }
 
@@ -58,17 +57,18 @@ class TimerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _errorFlow.value = if (addTimerUseCase(name, dateMillis, hour, minute)) {
-                null
-            } else {
-                R.string.add_error_duplicate
-            }
+            _errorFlow.value =
+                if (addTimerUseCase(name, dateMillis, hour, minute)) {
+                    null
+                } else {
+                    R.string.add_error_duplicate
+                }
         }
     }
 
-    fun popTimer(id: Int) {
+    fun popTimer(timer: Timer) {
         viewModelScope.launch {
-            popTimerUseCase(id)
+            popTimerUseCase(timer)
         }
     }
 }

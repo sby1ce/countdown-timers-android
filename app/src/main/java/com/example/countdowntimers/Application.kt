@@ -1,10 +1,11 @@
 package com.example.countdowntimers
 
 import android.app.Application
+import android.content.Context
+import com.example.countdowntimers.model.AppDataContainer
 import com.example.countdowntimers.lib.Clock
 import com.example.countdowntimers.lib.SystemClock
-import com.example.countdowntimers.lib.Timer
-import com.example.countdowntimers.model.TimerRepository
+import com.example.countdowntimers.lib.TimerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 @HiltAndroidApp
-class TimerApplication : Application() {}
+class TimerApplication : Application()
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -25,10 +26,6 @@ object TimersModule {
     fun providesContext(): CoroutineContext = Dispatchers.Main
 
     @Provides
-    fun providesRepository(): TimerRepository = TimerRepository(
-        listOf(
-            Timer(key = 1, name = "Timer 1", origin = 0),
-            Timer(key = 2, name = "Timer 2", origin = 10000),
-        )
-    )
+    fun providesTimerRepository(context: Context): TimerRepository =
+        AppDataContainer(context).timerRepository
 }
