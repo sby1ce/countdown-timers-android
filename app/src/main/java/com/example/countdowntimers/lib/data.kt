@@ -38,6 +38,7 @@ abstract class TimerDatabase : RoomDatabase() {
         fun getDatabase(context: Context): TimerDatabase = Instance ?: synchronized(this) {
             Room.databaseBuilder(context, TimerDatabase::class.java, "timer_database")
                 .fallbackToDestructiveMigration(false)
+                .enableMultiInstanceInvalidation()
                 .build()
         }
     }

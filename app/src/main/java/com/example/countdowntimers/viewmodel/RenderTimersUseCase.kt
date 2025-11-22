@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import javax.inject.Inject
@@ -20,17 +20,17 @@ class RenderTimersUseCase @Inject constructor(
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(scope: CoroutineScope): Flow<List<Pair<Timer, List<String>>>> {
-        return repository.getTimers()  // Flow<List<Timer>>
-            .flatMapLatest { timers ->
-                // Emit updated render state every second
-                flow {
-                    while (scope.isActive) {
-                        val now = clock.now()
-                        val render = timers zip ktTimers(origins(timers), now)
-                        emit(render)
-                        delay(1000)
-                    }
-                }
+        val ticker = flow {
+            while (scope.isActive) {
+                emit(Unit)
+                delay(1000)
+            }
+        }
+
+        return repository.getTimers() // Flow<List<Timer>>
+            .combine(ticker) { timers, _ ->
+                val now = clock.now()
+                timers zip ktTimers(origins(timers), now)
             }
     }
 }
