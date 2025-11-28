@@ -8,8 +8,12 @@ interface AppContainer {
     val timerRepository: TimerRepository
 }
 
-class AppDataContainer(private val context: Context) : AppContainer {
+class AppDataContainer(context: Context, server: ServerService) :
+    AppContainer {
     override val timerRepository: TimerRepository by lazy {
-        OfflineTimerRepository(TimerDatabase.getDatabase(context).timerDao())
+        OfflineTimerRepository(
+            TimerDatabase.getDatabase(context).timerDao(),
+            server
+        )
     }
 }

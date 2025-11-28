@@ -27,3 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CountdownTimers"
 include(":app")
+include(":server")
