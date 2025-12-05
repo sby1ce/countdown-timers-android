@@ -17,4 +17,5 @@ application {
 dependencies {
     implementation(libs.javalin)
     implementation(libs.gson)
+    implementation(libs.sqlite.jdbc)
 }

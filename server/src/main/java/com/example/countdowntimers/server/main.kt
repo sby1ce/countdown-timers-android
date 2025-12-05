@@ -5,27 +5,35 @@ import io.javalin.Javalin
 import io.javalin.http.bodyAsClass
 import io.javalin.json.JavalinGson
 
-
 data class Timer(
-    val id: Int,
+    val key: Int,
     val name: String,
     val origin: Long,
 )
 
 fun main() {
+    val repo = TimerRepository()
+
     Javalin.create { config ->
         config.jsonMapper(JavalinGson(Gson()))
     }
-        .get("/") { ctx -> ctx.json(Timer(0, "DEF", 0L)) }
+        .get("/") { ctx ->
+            val timers = repo.findAll()
+            ctx.json(timers)
+        }
         .post("/") { ctx ->
             val timer = ctx.bodyAsClass<Timer>()
-            println(timer)
-            ctx.status(201)
+            val created = repo.create(timer)
+            ctx.status(201).json(created)
         }
-        .delete("/") { ctx ->
-            val timer = ctx.bodyAsClass<Timer>()
-            println(timer)
-            ctx.status(200)
+        .delete("/{id}") { ctx ->
+            val id = ctx.pathParam("id").toInt()
+            val deleted = repo.delete(id)
+            if (deleted) {
+                ctx.status(200)
+            } else {
+                ctx.status(404)
+            }
         }
         .start(7070)
 }
