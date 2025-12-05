@@ -16,4 +16,5 @@ application {
 }
 dependencies {
     implementation(libs.javalin)
+    implementation(libs.gson)
 }

@@ -1,6 +1,5 @@
 package com.example.countdowntimers.model
 
-import android.util.Log
 import com.example.countdowntimers.lib.Timer
 import com.example.countdowntimers.lib.TimerDao
 import com.example.countdowntimers.lib.TimerRepository
@@ -13,10 +12,12 @@ class OfflineTimerRepository(private val timerDao: TimerDao, private val server:
 
     // DAO returns -1 on error
     override suspend fun insertTimer(timer: Timer): Boolean {
-        val resp = server.hello()
-        Log.d("OfflineTimerRepository", resp)
+        server.insert(timer)
         return timerDao.insert(timer) != -1L
     }
 
-    override suspend fun deleteTimer(timer: Timer) = timerDao.delete(timer)
+    override suspend fun deleteTimer(timer: Timer) {
+        server.delete(timer)
+        timerDao.delete(timer)
+    }
 }

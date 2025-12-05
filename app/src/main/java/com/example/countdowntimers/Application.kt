@@ -16,6 +16,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.create
+import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.coroutines.CoroutineContext
 
 @HiltAndroidApp
@@ -36,7 +37,8 @@ object TimersModule {
     @Provides
     fun providesRetrofit(): ServerService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://localhost:7070")
+            .baseUrl("http://10.0.2.2:7070")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
         return retrofit.create<ServerService>()
     }
