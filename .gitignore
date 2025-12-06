@@ -13,6 +13,8 @@ captures/
 local.properties
 studio.vmoptions
 
+*.db
+
 release/
 
 target/
