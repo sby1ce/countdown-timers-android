@@ -12,39 +12,45 @@ import com.example.countdowntimers.viewmodel.PopTimerUseCase
 import com.example.countdowntimers.viewmodel.RenderTimersUseCase
 import com.example.countdowntimers.viewmodel.TimerViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Rule
 import org.junit.Test
 
 class AddTimerTest {
     class FakeDao : TimerDao {
+        companion object {
+            val state = MutableStateFlow(mutableListOf<Timer>())
+        }
+
         override suspend fun insert(timer: Timer): Long {
-            TODO("Not yet implemented")
+            if (hasTimer(timer.key)) {
+                return -1L
+            }
+            state.value.add(timer)
+            return 1L
         }
 
         override suspend fun delete(timer: Timer) {
-            TODO("Not yet implemented")
+            state.value.removeIf { item -> item.key == timer.key }
         }
 
         override fun getTimers(): Flow<List<Timer>> {
-            TODO("Not yet implemented")
+            return state.asStateFlow()
         }
 
         override suspend fun hasTimer(id: Int): Boolean {
-            TODO("Not yet implemented")
+            return state.value.any { item -> item.key == id }
         }
     }
     class FakeServer : ServerService {
-        override suspend fun hello(): Timer {
-            TODO("Not yet implemented")
+        override suspend fun select(): List<Timer> {
+            return emptyList()
         }
 
-        override suspend fun insert(timer: Timer) {
-            TODO("Not yet implemented")
-        }
+        override suspend fun insert(timer: Timer) {}
 
-        override suspend fun delete(timer: Timer) {
-            TODO("Not yet implemented")
-        }
+        override suspend fun delete(id: Int) {}
     }
 
     @get:Rule
