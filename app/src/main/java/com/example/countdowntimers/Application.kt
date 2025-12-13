@@ -7,6 +7,7 @@ import com.example.countdowntimers.lib.Clock
 import com.example.countdowntimers.lib.SystemClock
 import com.example.countdowntimers.lib.TimerRepository
 import com.example.countdowntimers.model.ServerService
+import com.example.countdowntimers.model.UserIdInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +15,7 @@ import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.create
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,6 +41,10 @@ object TimersModule {
         val retrofit = Retrofit.Builder()
             .baseUrl("http://10.0.2.2:7070")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder()
+                .addInterceptor(UserIdInterceptor("user-id"))
+                .build())
             .build()
         return retrofit.create<ServerService>()
     }
